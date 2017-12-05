@@ -1,11 +1,9 @@
 <?php
 
-
 class IncontactAPI{
 
     protected $startDate;
     protected $endDate;
-
     protected $access_token;
     // protected $refresh_token;
     protected $resource_server_base_uri;
@@ -13,7 +11,7 @@ class IncontactAPI{
     protected $token_time;
     protected $criteria;
 
-    function __construct($startDate, $endDate, $criteria=null){
+    function __construct($startDate, $endDate, $criteria = null){
         $valid_fields = array(
             'toAddr',
             'updatedSince',
@@ -34,10 +32,10 @@ class IncontactAPI{
         );
         $this->startDate = date('Y-m-d', strtotime($startDate));
         $this->endDate = date('Y-m-d', strtotime($endDate));
-        if(is_array($criteria)){
+        if (is_array($criteria)) {
             $this->criteria = array();
-            foreach($valid_fields as $valid_field){
-                if(isset($criteria[$valid_field])){
+            foreach ($valid_fields as $valid_field) {
+                if (isset($criteria[$valid_field])) {
                     $this->criteria[$valid_field] = $criteria[$valid_field];
                 }
             }
@@ -46,7 +44,7 @@ class IncontactAPI{
         $this->generate_ictoken();
     }
 
-    function get_calls($retry=false) {
+    function get_calls($retry = false){
         $access_token = $this->access_token;
         // $refresh_token = $this->refresh_token;
         $resource_server_base_uri = $this->resource_server_base_uri;
@@ -59,7 +57,7 @@ class IncontactAPI{
         $qs = '?startDate=' . rawurlencode($this->startDate . 'T00:00:00-05:00') . '&endDate=' . rawurlencode($this->endDate . 'T23:59:59-05:00');
         $qs .= '&mediaTypeId=4'; // filters only phone calls
 
-        if(is_array($this->criteria)){
+        if (is_array($this->criteria)) {
             $qs .= '&' . http_build_query($this->criteria);
         }
         $url = $api_base_url . $api_scope . $qs;
@@ -82,7 +80,8 @@ class IncontactAPI{
         curl_close($ch);
 //        var_dump($result);
 
-$call_data = array();
+
+        $call_data = array();
         if ($http_code != 200) {
             if ($http_code == 401 && !$retry) {
                 $this->generate_ictoken();
@@ -99,7 +98,7 @@ $call_data = array();
         return $call_data;
     }
 
-    protected function generate_ictoken() {
+    protected function generate_ictoken(){
         $app_string = '<APPSTRING>';
         $auth_key = base64_encode($app_string);
         $url = 'https://api.incontact.com/InContactAuthorizationServer/Token';
@@ -141,12 +140,14 @@ $call_data = array();
 }
 
 $criteria = array(
-//    'fromAddr' => '9995551234',
+//    'fromAddr' => '<FROMADDRESS>',
     'teamId' => '<TEAMID>'
 );
+
 $toPhone = '8885551212';  // 8885551234, 8885551235, 8885551236, 8885551237, etc.
 $startDate = 'November 27, 2017';
 $endDate = 'November 30, 2017';
 $instance = new IncontactAPI($toPhone, $startDate, $endDate, $criteria);
 $lead_data = $instance->get_calls();
+
 var_dump($lead_data);
