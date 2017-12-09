@@ -1,5 +1,5 @@
 # inContact API
-This is the final PHP class and support functions for a project interfacing with the inContact API now on the production. I also included the file used in development that connected with a MySQL database to help anyone getting started implementing this API. 
+This is the final PHP class and support functions for a project interfacing with the inContact API now on the production server. I also included the file used in development that connected with a MySQL database to help anyone getting started implementing this API. 
 
 ## Usage - class IncontactAPI 
 Establish the information you want to return (agent, skill, team, campaign, disposition etc.) from the completed contacts. Define the date range with startDate and endDate or return all the data by specifying updatedSince. 
@@ -26,6 +26,36 @@ protected function generate_ictoken(){
             "scope" : ""
         }';
 ...
+```
+
+## Usage - DB example
+Same setup as above with the added component of connecting to a database. 
+```php
+protected function get_source($phone){
+        global $userdb;
+
+        // check phone against db data
+        $sql = "SELECT id, lead_source FROM <DBTABLE> WHERE phone_clean = '$phone' LIMIT 0, 1";
+        $row = $userdb->get_row($sql);
+        $lead_source = $row->lead_source;
+
+        // if blank, insert into the db for updating with a lead source later
+...
+```
+
+Establish the criteria that you want to test and set a new IncontactAPI and pass the date range with startDate, endDate, and criteria as lead_data. var_dump for verification and troubleshooting. 
+```php
+$criteria = array(
+    'fromAddr' => '<PHONENUMBER>',
+    'teamId' => '<TEAMID>'
+...
+
+$toPhone = '<PHONENUMBER>';
+$startDate = '<STARTDATE>';
+$endDate = '<ENDDATE>';
+$instance = new IncontactAPI($toPhone, $startDate, $endDate, $criteria);
+$lead_data = $instance->get_call();
+var_dump($lead_data);
 ```
 
 
