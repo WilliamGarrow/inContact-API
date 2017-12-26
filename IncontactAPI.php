@@ -98,13 +98,13 @@ class IncontactAPI{
     }
 
     protected function generate_ictoken(){
-        $app_string = '<APPSTRING>';
+        $app_string = '<YOUR APP STRING>';
         $auth_key = base64_encode($app_string);
         $url = 'https://api.incontact.com/InContactAuthorizationServer/Token';
         $post_json = '{
             "grant_type" : "password",
-            "username" : "<USERNAME>",
-            "password" : "<PASSWORD>",
+            "username" : "<YOUR USERNAME>",
+            "password" : "<YOUR PASSWORD>",
             "scope" : ""
         }';
 
