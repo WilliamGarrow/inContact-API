@@ -68,8 +68,8 @@ class IncontactAPI{
         // set the startDate to 30 days in the past to catch calls initially captured by the answering service
         $qs = '?startDate=' . rawurlencode($this->startDate . 'T00:00:00-05:00') . '&endDate=' . rawurlencode($this->endDate . 'T23:59:59-05:00');
         $qs .= '&mediaTypeId=4';  // mediaTypeId 4 is phone calls only
-        // $qs .= '&skillId=<SKILLID>';  // inbound calls only - could be "ans service" instead of just inbound
-        // $qs .= '&teamId=<TEAMID>';  // calls to agents only - not limited to agents for this particular lookup
+        // $qs .= '&skillId=<YOUR SKILL ID>';  // inbound calls only - could be "ans service" instead of just inbound
+        // $qs .= '&teamId=<YOUR TEAM ID>';  // calls to agents only - not limited to agents for this particular lookup
         $qs .= '&toAddr=' . $this->toAddr;  // calls specific to this number only
         if (is_array($this->criteria)){
             $qs .= '&' . http_build_query($this->criteria);
@@ -117,14 +117,14 @@ class IncontactAPI{
         global $userdb;
 
         // check phone against db data
-        $sql = "SELECT id, lead_source FROM <DBTABLE> WHERE phone_clean = '$phone' LIMIT 0, 1";
+        $sql = "SELECT id, lead_source FROM <YOUR DB TABLE> WHERE phone_clean = '$phone' LIMIT 0, 1";
         $row = $userdb->get_row($sql);
         $lead_source = $row->lead_source;
 
         // if blank, insert into the db for updating with a lead source later
         if (empty($lead_source)){
             // comparison against the new db
-            $sql = "SELECT affiliate_code, lead_source, utm_campaign FROM <PHONETRACKING> WHERE phone = '$phone' LIMIT 0, 1";
+            $sql = "SELECT affiliate_code, lead_source, utm_campaign FROM <YOUR PHONE TRACKING> WHERE phone = '$phone' LIMIT 0, 1";
             $row = $userdb->get_row($sql);
             // concatenate all 3 values that need to be set
             if (!empty($row)){
@@ -132,7 +132,7 @@ class IncontactAPI{
             }
 
             if (empty($lead_source)){
-                $sql = "INSERT INTO <DBTABLE> (phone_clean, lead_source) VALUES ('$phone', 'Unknown')";
+                $sql = "INSERT INTO <YOUR DB TABLE> (phone_clean, lead_source) VALUES ('$phone', 'Unknown')";
                 $userdb->query($sql);
                 $lead_source = 'Unknown';
             }
@@ -142,13 +142,13 @@ class IncontactAPI{
     }
 
     protected function generate_ictoken(){
-        $app_string = '<APPSTRING>';
+        $app_string = '<YOUR APP STRING>';
         $auth_key = base64_encode($app_string);
         $url = 'https://api.incontact.com/InContactAuthorizationServer/Token';
         $post_json = '{
 		"grant_type" : "password",
-		"username" : "<USERNAME>",
-		"password" : "<PASSWORD>",
+		"username" : "<YOUR USER NAME>",
+		"password" : "<YOUR PASSWORD>",
 		"scope" : ""
 	}';
 
@@ -183,13 +183,13 @@ class IncontactAPI{
 }
 
 $criteria = array(
-    // 'fromAddr' => '<PHONENUMBER>',
+    // 'fromAddr' => 'YOUR FROM PHONE NUMBER>',
     'teamId' => '<TEAMID>'
 );
 
-$toPhone = '<PHONENUMBER>';
-$startDate = '<STARTDATE>';
-$endDate = '<ENDDATE>';
+$toPhone = '<YOUR TO PHONE NUMBER>';
+$startDate = '<START DATE>';
+$endDate = '<END DATE>';
 $instance = new IncontactAPI($toPhone, $startDate, $endDate, $criteria);
 $lead_data = $instance->get_call();
 var_dump($lead_data);
